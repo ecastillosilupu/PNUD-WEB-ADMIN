@@ -1,0 +1,23 @@
+<div class="row">
+  <div>
+    <button mat-stroked-button (click)="onNuevoEnlace()" color="primary">Nuevo Enlace</button>
+  </div>
+  <hr>
+  <div class="col-lg-4" *ngFor="let item of dataEnlace; let i = index;">
+    <mat-card>
+        <mat-card-subtitle>
+            <span class="si-active" *ngIf="item.bolEnlaceEstado">ACTIVO</span>
+            <span class="no-active" *ngIf="!item.bolEnlaceEstado">NO ACTIVO</span>
+        </mat-card-subtitle>
+        <mat-card-title>{{item.txtEnlaceNombre}}</mat-card-title>
+        <mat-card-content>
+          <p>{{item.txtEnlaceDescripcion}}</p>
+        </mat-card-content>
+        <mat-divider inset></mat-divider>
+        <mat-card-actions>
+          <button mat-stroked-button [disabled]="!item.bolEnlaceEstado" (click)="onEditarEnlace(item, i)" color="primary">Editar</button>
+          <button mat-stroked-button [disabled]="!item.bolEnlaceEstado" color="primary">Ir a la aplicación</button>
+        </mat-card-actions>
+    </mat-card>&nbsp;
+  </div>
+</div>

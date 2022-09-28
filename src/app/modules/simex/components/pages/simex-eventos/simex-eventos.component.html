@@ -1,0 +1,289 @@
+<div *ngIf="!bolNuevoEvento">
+    <div align="end">
+        <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+            <mat-button-toggle (click)="onFiltro(0)" value="bold">TODOS</mat-button-toggle>
+            <mat-button-toggle (click)="onFiltro(1)" value="italic">INICIADOS</mat-button-toggle>
+            <mat-button-toggle (click)="onFiltro(2)" value="underline">PENDIENTES</mat-button-toggle>
+            <mat-button-toggle (click)="onFiltro(3)" value="underline">FINALIZADOS</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <button mat-stroked-button (click)="onNuevoEvento(true)" color="primary">Nuevo Evento</button>
+    <hr>
+    <div class="row">
+        <div class="col-lg-3" *ngFor="let item of dataEventoFiltro; let i = index;">
+            <mat-card [ngClass]="item.bolEventoIniciado ? 'evento-activo' : (item.bolEventoActivo ? 'evento-pendiente' :'evento-finalizado-caducado')">
+                <mat-card-title *ngIf="item.bolEventoIniciado">EVENTO INICIADO</mat-card-title>
+                <mat-card-title *ngIf="!item.bolEventoIniciado && item.bolEventoActivo">PENDIENTE</mat-card-title>
+                <mat-card-title *ngIf="!item.bolEventoIniciado && !item.bolEventoActivo">FINALIZADO</mat-card-title>
+                <hr>
+                <span>Fecha: {{item.datEventoFecha }} desde {{ item.timEventoHoraInicio }} hasta {{ item.timEventoHoraFin }} horas</span>
+                <hr>
+                <mat-card-title>{{item.txtEventoNombre}}</mat-card-title>
+                <mat-card-content>
+                <p>{{item.txtEventoLugar}}</p>
+                <p>{{item.txtEventoDescripcion}}</p>
+                </mat-card-content>
+                <mat-divider inset></mat-divider>
+                <mat-card-actions>
+                <button mat-raised-button [disabled]="!item.bolEventoActivo" *ngIf="!item.bolEventoIniciado" (click)="onEditarEvento(item, i)"><mat-icon>edit</mat-icon>Editar</button>
+                <button mat-raised-button [disabled]="!item.bolEventoActivo" *ngIf="!item.bolEventoIniciado" (click)="onIniciarEvento(i)"><mat-icon>send</mat-icon>Inicial</button>
+                <button mat-raised-button *ngIf="item.bolEventoIniciado"><mat-icon>visibility</mat-icon> ver</button>
+                <button mat-raised-button *ngIf="item.bolEventoIniciado" (click)="onFinalizarEvento(i)"><mat-icon>close</mat-icon>Finalizar</button>
+                </mat-card-actions>
+                <mat-card-actions align="end">
+                    <button mat-button><mat-icon>group</mat-icon>Participantes</button><br>
+                    <button mat-button><mat-icon>message</mat-icon>Mensajes</button><br>
+                    <button mat-button><mat-icon>report</mat-icon>Reportes</button>
+                </mat-card-actions>
+                <mat-card-footer>
+                    <mat-progress-bar *ngIf="item.bolEventoIniciado" mode="indeterminate"></mat-progress-bar>
+                </mat-card-footer>
+            </mat-card>&nbsp;
+        </div>
+    </div>
+</div>
+<div *ngIf="bolNuevoEvento">
+    <div>
+        <button mat-stroked-button (click)="onNuevoEvento(false)" color="warn">Cancelar</button>
+    </div>
+    <mat-stepper linear #stepper>
+        <mat-step [stepControl]="datosEventoFormGroup">
+            <form [formGroup]="datosEventoFormGroup">
+            <ng-template matStepLabel title="DATOS EVENTO">DATOS EVENTO</ng-template>
+            <div class="col-lg-12 row">
+                <mat-form-field class="col-lg-12" appearance="outline">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput maxlength="200" #inputtxtEventoNombre formControlName="txtEventoNombre" placeholder="Nombre" required>
+                    <mat-hint align="end">{{inputtxtEventoNombre.value.length || 0}}/200</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="col-lg-12" appearance="outline">
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput maxlength="400" #inputtxtEventoDescripcion rows="4" formControlName="txtEventoDescripcion" placeholder="Descripción" required></textarea>
+                    <mat-hint align="end">{{inputtxtEventoDescripcion.value.length || 0}}/200</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="col-lg-12" appearance="outline">
+                    <mat-label>Lugar</mat-label>
+                    <input matInput maxlength="200" #inputtxtEventoLugar formControlName="txtEventoLugar" placeholder="Lugar" required>
+                    <mat-hint align="end">{{inputtxtEventoLugar.value.length || 0}}/200</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="col-lg-4" appearance="outline">
+                    <mat-label>Fecha</mat-label>
+                    <input matInput type="date" formControlName="datEventoFecha" placeholder="Fecha" required>
+                    <mat-hint align="end">Formato; DD/MM/YYYY</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="col-lg-4" appearance="outline">
+                    <mat-label>Hora Inicio</mat-label>
+                    <input matInput type="time" formControlName="timEventoHoraInicio" placeholder="Hora Inicio" required>
+                    <mat-hint align="end">Formato: 24h, ejem 15:30</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="col-lg-4" appearance="outline">
+                    <mat-label>Hora Fin</mat-label>
+                    <input matInput type="time" formControlName="timEventoHoraFin" placeholder="Hora Fin" required>
+                    <mat-hint align="end">Formato: 24h, ejem 15:30</mat-hint>
+                </mat-form-field>
+            </div>
+            <hr>
+            <div>
+                <button mat-stroked-button matStepperNext color="primary">Siguiente</button>
+            </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="gruposEventoFormGroup">
+            <form [formGroup]="gruposEventoFormGroup">
+            <ng-template matStepLabel title="GRUPOS">GRUPOS</ng-template>
+            <mat-form-field class="col-lg-12" *ngIf="addGrupo" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input matInput maxlength="200" #inputtxtGrupoNombre formControlName="txtGrupoNombre" placeholder="Nombre" required>
+                <mat-hint align="end">{{inputtxtGrupoNombre.value.length || 0}}/200</mat-hint>
+            </mat-form-field>
+            <button *ngIf="addGrupo" mat-stroked-button align="end" (click)="onAgregarGrupo()" color="primary">
+                <mat-icon>save</mat-icon> Guardar
+            </button>
+            <button *ngIf="!addGrupo" mat-stroked-button align="end" (click)="onAgregarGrupo()" color="primary">
+                <mat-icon>add</mat-icon> Nuevo
+            </button>
+            <hr>
+            <div class="col-lg-12">
+                <div class="example-container mat-elevation-z8">
+                    <div class="example-loading-shade"
+                            *ngIf="isLoadingResults || isRateLimitReached">
+                        <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+                        <div class="example-rate-limit-reached" *ngIf="isRateLimitReached">
+                        GitHub's API rate limit has been reached. It will be reset in one minute.
+                        </div>
+                    </div>
+                    <div class="example-table-container">
+                        <table mat-table [dataSource]="dataEventoGruposLista" class="example-table" matSort matSortActive="created" matSortDisableClear matSortDirection="desc">
+                        <ng-container matColumnDef="item">
+                            <th mat-header-cell *matHeaderCellDef>#</th>
+                            <td mat-cell *matCellDef="let row; let i = index;">{{ i + 1 }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="txtGrupoNombre">
+                            <th mat-header-cell *matHeaderCellDef>Grupo</th>
+                            <td mat-cell *matCellDef="let row">{{row.txtGrupoNombre}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="bolGrupoActivo">
+                            <th mat-header-cell *matHeaderCellDef>Activo</th>
+                            <td mat-cell *matCellDef="let row">
+                                <mat-slide-toggle [(ngModel)]="row.bolGrupoActivo"></mat-slide-toggle>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsGrupo"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsGrupo;"></tr>
+                        </table>
+                    </div>
+                    <mat-paginator [length]="resultsLength" [pageSize]="30" aria-label="Select page of GitHub search results"></mat-paginator>
+                </div>
+            </div>
+            <hr>
+            <div>
+                <button mat-stroked-button matStepperPrevious color="warn" class="m-1">Anterior</button>
+                <button mat-stroked-button matStepperNext *ngIf="dataEventoGruposLista.data.length > 0" color="primary" class="m-1">Siguiente</button>
+            </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="subGruposEventoFormGroup">
+            <form [formGroup]="subGruposEventoFormGroup">
+                <ng-template matStepLabel title="SUB GRUPOS">SUB GRUPOS</ng-template>
+                <div class="col-lg-12 row">
+                    <mat-form-field *ngIf="addSubGrupo" class="col-lg-6" appearance="outline">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select formControlName="datGrupo" required>
+                        <mat-option *ngFor="let item of dataEventoGruposLista.data" [value]="item">{{item.txtGrupoNombre}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="addSubGrupo" class="col-lg-6" appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input matInput maxlength="200" #inputtxtSubGrupoNombre formControlName="txtSubGrupoNombre" placeholder="Nombre" required>
+                        <mat-hint align="end">{{inputtxtSubGrupoNombre.value.length || 0}}/200</mat-hint>
+                    </mat-form-field>
+                </div>
+                <button *ngIf="addSubGrupo" mat-stroked-button align="end" (click)="onAgregarSubGrupo()" color="primary">
+                    <mat-icon>save</mat-icon> Guardar
+                </button>
+                <button *ngIf="!addSubGrupo" mat-stroked-button align="end" (click)="onAgregarSubGrupo()" color="primary">
+                    <mat-icon>add</mat-icon> Nuevo
+                </button>
+                <hr>
+                <div class="col-lg-12">
+                    <div class="example-container mat-elevation-z8">
+                        <div class="example-loading-shade"
+                                *ngIf="isLoadingResults || isRateLimitReached">
+                            <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+                            <div class="example-rate-limit-reached" *ngIf="isRateLimitReached">
+                            GitHub's API rate limit has been reached. It will be reset in one minute.
+                            </div>
+                        </div>
+                        <div class="example-table-container">
+                            <table mat-table [dataSource]="dataEventoSubGruposLista" class="example-table" matSort matSortActive="created" matSortDisableClear matSortDirection="desc">
+                            <ng-container matColumnDef="item">
+                                <th mat-header-cell *matHeaderCellDef>#</th>
+                                <td mat-cell *matCellDef="let row; let i = index;">{{ i + 1 }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="txtGrupoNombre">
+                                <th mat-header-cell *matHeaderCellDef>Grupo</th>
+                                <td mat-cell *matCellDef="let row">{{row.txtGrupoNombre}}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="txtSubGrupoNombre">
+                                <th mat-header-cell *matHeaderCellDef>Sub Grupo</th>
+                                <td mat-cell *matCellDef="let row">{{row.txtSubGrupoNombre}}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="bolSubGrupoActivo">
+                                <th mat-header-cell *matHeaderCellDef>Activo</th>
+                                <td mat-cell *matCellDef="let row">
+                                    <mat-slide-toggle [(ngModel)]="row.bolSubGrupoActivo"></mat-slide-toggle>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsSubGrupo"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsSubGrupo;"></tr>
+                            </table>
+                        </div>
+                        <mat-paginator [length]="resultsLength" [pageSize]="30" aria-label="Select page of GitHub search results"></mat-paginator>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <button mat-stroked-button matStepperPrevious color="warn" class="m-1">Anterior</button>
+                    <button mat-stroked-button matStepperNext *ngIf="dataEventoSubGruposLista.data.length > 0" color="primary" class="m-1">Siguiente</button>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="perfilEncargadoEventoFormGroup">
+            <form [formGroup]="perfilEncargadoEventoFormGroup">
+                <ng-template matStepLabel title="SUB GRUPOS">PERFILES EXCON - GRUPO</ng-template>
+                <div class="col-lg-12 row">
+                    <mat-form-field *ngIf="addPerfilEncargado" class="col-lg-6" appearance="outline">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select formControlName="datGrupo" required>
+                        <mat-option *ngFor="let item of dataEventoGruposLista.data" [value]="item">{{item.txtGrupoNombre}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="addPerfilEncargado" class="col-lg-6" appearance="outline">
+                        <mat-label>Personal EXCON</mat-label>
+                        <mat-select formControlName="datPerfil" required>
+                        <mat-option *ngFor="let item of dataEventoPerfil" [value]="item">{{item.txtPerfilEncargadoNombre}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <button *ngIf="addPerfilEncargado" mat-stroked-button align="end" (click)="onAgregarPerfilEncargado()" color="primary">
+                    <mat-icon>save</mat-icon> Guardar
+                </button>
+                <button *ngIf="!addPerfilEncargado" mat-stroked-button align="end" (click)="onAgregarPerfilEncargado()" color="primary">
+                    <mat-icon>add</mat-icon> Nuevo
+                </button>
+                <hr>
+                <div class="col-lg-12">
+                    <div class="example-container mat-elevation-z8">
+                        <div class="example-loading-shade"
+                                *ngIf="isLoadingResults || isRateLimitReached">
+                            <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+                            <div class="example-rate-limit-reached" *ngIf="isRateLimitReached">
+                            GitHub's API rate limit has been reached. It will be reset in one minute.
+                            </div>
+                        </div>
+                        <div class="example-table-container">
+                            <table mat-table [dataSource]="dataEventoPerfilEncargadoLista" class="example-table" matSort matSortActive="created" matSortDisableClear matSortDirection="desc">
+                                <ng-container matColumnDef="item">
+                                    <th mat-header-cell *matHeaderCellDef>#</th>
+                                    <td mat-cell *matCellDef="let row; let i = index;">{{ i + 1 }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="txtGrupoNombre">
+                                    <th mat-header-cell *matHeaderCellDef>Grupo</th>
+                                    <td mat-cell *matCellDef="let row">{{row.txtGrupoNombre}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="txtPerfilEncargadoNombre">
+                                    <th mat-header-cell *matHeaderCellDef>Encargado Nombre</th>
+                                    <td mat-cell *matCellDef="let row">{{row.txtPerfilEncargadoNombre}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="bolPerfilEncargadoActivo">
+                                    <th mat-header-cell *matHeaderCellDef>Activo</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <mat-slide-toggle [(ngModel)]="row.bolPerfilEncargadoActivo"></mat-slide-toggle>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumnsPerfilEncargado"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumnsPerfilEncargado;"></tr>
+                            </table>
+                        </div>
+                        <mat-paginator [length]="resultsLength" [pageSize]="30" aria-label="Select page of GitHub search results"></mat-paginator>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <button mat-stroked-button matStepperPrevious color="warn" class="m-1">Anterior</button>
+                    <button mat-stroked-button *ngIf="dataEventoPerfilEncargadoLista.data.length > 0" (click)="onGuardarEvento()" color="primary" class="m-1">Guardar</button>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="subGruposEventoFormGroup">
+            <form [formGroup]="subGruposEventoFormGroup">
+                <ng-template matStepLabel title="SUB GRUPOS">INVITACION PARTICIPANTES</ng-template>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="subGruposEventoFormGroup">
+            <form [formGroup]="subGruposEventoFormGroup">
+                <ng-template matStepLabel title="SUB GRUPOS">FORMATO DE EVALUACIÓN</ng-template>
+            </form>
+        </mat-step>
+    </mat-stepper>
+</div>

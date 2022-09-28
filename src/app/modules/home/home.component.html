@@ -1,0 +1,29 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button class="example-icon" (click)="drawer.toggle()" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <!--<a class="navbar-brand" href="#">
+    <img src="assets/image/logo-simex.svg" alt="Bootstrap" width="120" height="30">
+  </a>-->
+  <span>PNUD</span>
+  <span class="example-spacer"></span>
+  <button mat-button routerLink="/pnud/simex/eventos">Eventos</button>
+  <button mat-button routerLink="/pnud/simex/mantenimiento">Mantenimiento</button>
+  <button mat-button routerLink="/pnud/simex/enlaces">Enlaces</button>
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with heart icon">
+    <mat-icon>person</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer class="example-sidenav" mode="side">
+  <!--<mat-drawer #drawer class="example-sidenav" mode="side" opened>-->
+    <mat-list>
+      <button mat-icon-button routerLink="/**">
+        <mat-icon>person</mat-icon> Usuario
+      </button>
+    </mat-list>
+  </mat-drawer>
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
